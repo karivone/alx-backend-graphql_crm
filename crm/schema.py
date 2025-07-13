@@ -170,7 +170,27 @@ class CreateOrder(graphene.Mutation):
 
         return CreateOrder(order=order)
 
+class UpdateLowStockProducts(graphene.Mutation):
+    class Output:
+        updated_products = graphene.List(ProductType)
+        message = graphene.String()
 
+    @classmethod
+    def mutate(cls, root, info):
+        low_stock_products = Product.objects.filter(stock__lt=10)
+        updated = []
+
+        for product in low_stock_products:
+            product.stock += 10
+            product.save()
+            updated.append(product)
+
+        if updated:
+            msg = f"{len(updated)} products restocked."
+        else:
+            msg = "No low-stock products found."
+
+        return UpdateLowStockProducts(updated_products=updated, message=msg)
 # ==============================
 # Main Mutation & Query classes
 # ==============================
@@ -180,6 +200,7 @@ class Mutation(graphene.ObjectType):
     bulk_create_customers = BulkCreateCustomers.Field()
     create_product = CreateProduct.Field()
     create_order = CreateOrder.Field()
+    update_low_stock_products = UpdateLowStockProducts.Field()
 
 
 class Query(graphene.ObjectType):

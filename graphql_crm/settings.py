@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'graphene_django',
     'django_filters',  # ← ADD THIS LINE
+    'django_crontab',
+    'django_celery_beat',
     'crm',
 ]
 
